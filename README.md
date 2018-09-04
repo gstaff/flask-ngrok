@@ -8,7 +8,7 @@ Python 3.6+ is required.
 
 ## Installation
 ```bash
-pip install flask-ngrok
+pip install Flask flask-ngrok
 ```
 
 ## Quickstart
