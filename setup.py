@@ -17,6 +17,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     keywords='flask ngrok demo',
-    install_requires=['requests'],
+    install_requires=['Flask>=0.8, requests'],
     py_modules=['flask_ngrok']
 )
