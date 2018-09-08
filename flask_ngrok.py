@@ -1,5 +1,6 @@
 import atexit
 import json
+import os
 import platform
 import shutil
 import subprocess
@@ -50,6 +51,7 @@ def _download_ngrok(ngrok_path):
     download_path = _download_file(url)
     with zipfile.ZipFile(download_path, "r") as zip_ref:
         zip_ref.extractall(ngrok_path)
+    os.chmod(ngrok_path, 777)
 
 
 def _download_file(url):
