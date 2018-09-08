@@ -1,4 +1,6 @@
 # flask-ngrok
+[![PyPI](https://img.shields.io/pypi/v/nine.svg)](https://pypi.org/project/flask-ngrok/)
+
 A simple way to demo Flask apps from your machine.
 Makes your [Flask](http://flask.pocoo.org/) apps running on localhost available
  over the internet via the excellent [ngrok](https://ngrok.com/) tool.
@@ -7,12 +9,18 @@ Makes your [Flask](http://flask.pocoo.org/) apps running on localhost available
 Python 3.6+ is required.
 
 ## Installation
+
 ```bash
-pip install Flask flask-ngrok
+pip install flask-ngrok
+```
+### Inside Jupyter / Colab Notebooks
+Notebooks have [an issue](https://stackoverflow.com/questions/51180917/python-flask-unsupportedoperation-not-writable) with newer versions of Flask, so force an older version if working in these environments.
+```bash
+!pip install flask==0.12.2
 ```
 
 ## Quickstart
-1. Import with `from flask_ngrok import run_with_ngrok`
+1. Import with ```from flask_ngrok import run_with_ngrok```
 2. Add `run_with_ngrok(app)` to make your Flask app available upon running
 ```python
 # flask_ngrok_example.py
@@ -29,7 +37,7 @@ def hello():
 if __name__ == '__main__':
     app.run()
 ```
-
+Running the example:
 ```bash
 python flask_ngrok_example.py
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
