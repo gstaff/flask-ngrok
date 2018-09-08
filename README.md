@@ -1,5 +1,5 @@
 # flask-ngrok
-[![PyPI](https://img.shields.io/pypi/v/nine.svg)](https://pypi.org/project/flask-ngrok/)
+[![PyPI version](https://badge.fury.io/py/flask-ngrok.svg)](https://badge.fury.io/py/flask-ngrok)
 
 A simple way to demo Flask apps from your machine.
 Makes your [Flask](http://flask.pocoo.org/) apps running on localhost available
