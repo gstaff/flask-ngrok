@@ -8,10 +8,9 @@ import tempfile
 import time
 import zipfile
 from pathlib import Path
-from threading import Thread
+from threading import Timer
 
 import requests
-from flask import request
 
 
 def _run_ngrok():
@@ -67,6 +66,11 @@ def _download_file(url):
     return download_path
 
 
+def start_ngrok():
+    ngrok_address = _run_ngrok()
+    print(f" * Running on {ngrok_address}")
+    print(f" * Traffic stats available on http://127.0.0.1:4040")
+
 def run_with_ngrok(app):
     """
     The provided Flask app will be securely exposed to the public internet via ngrok when run,
@@ -77,14 +81,8 @@ def run_with_ngrok(app):
     old_run = app.run
 
     def new_run():
-        thread = Thread(target=old_run, daemon=True)
+        thread = Timer(1.0, start_ngrok)
+        thread.setDaemon(True)
         thread.start()
-        ngrok_address = _run_ngrok()
-        print(f" * Running on {ngrok_address}")
-        print(f" * Traffic stats available on http://127.0.0.1:4040")
-        try:
-            thread.join()
-        except KeyboardInterrupt:
-            from threading import *
-            thread._Thread_Stop()
+        old_run()
     app.run = new_run
