@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flask-ngrok",
-    version="0.0.22",
+    version="0.0.23",
     author="Grant Stafford",
     description="A simple way to demo Flask apps from your machine.",
     long_description=long_description,
