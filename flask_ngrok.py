@@ -31,7 +31,7 @@ def _run_ngrok():
     ngrok = subprocess.Popen([executable, 'http', '5000'])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
-    time.sleep(1)
+    time.sleep(0.1)
     tunnel_url = requests.get(localhost_url).text  # Get the tunnel information
     j = json.loads(tunnel_url)
 
@@ -71,6 +71,7 @@ def start_ngrok():
     print(f" * Running on {ngrok_address}")
     print(f" * Traffic stats available on http://127.0.0.1:4040")
 
+
 def run_with_ngrok(app):
     """
     The provided Flask app will be securely exposed to the public internet via ngrok when run,
@@ -81,7 +82,7 @@ def run_with_ngrok(app):
     old_run = app.run
 
     def new_run():
-        thread = Timer(1.0, start_ngrok)
+        thread = Timer(0.1, start_ngrok)
         thread.setDaemon(True)
         thread.start()
         old_run()
