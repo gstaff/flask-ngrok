@@ -76,7 +76,7 @@ def run_with_ngrok(app):
     old_run = app.run
 
     def new_run():
-        thread = Thread(target=old_run)
+        thread = Thread(target=old_run, daemon=True)
         thread.start()
         ngrok_address = _run_ngrok()
         print(f" * Running on {ngrok_address}")
