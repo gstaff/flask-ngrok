@@ -15,6 +15,7 @@ import requests
 def _run_ngrok():
     ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
     _download_ngrok(ngrok_path)
+    os.chmod(ngrok_path, 777)
     system = platform.system()
     if system == "Darwin":
         command = "ngrok"
@@ -51,7 +52,6 @@ def _download_ngrok(ngrok_path):
     download_path = _download_file(url)
     with zipfile.ZipFile(download_path, "r") as zip_ref:
         zip_ref.extractall(ngrok_path)
-    os.chmod(ngrok_path, 777)
 
 
 def _download_file(url):
