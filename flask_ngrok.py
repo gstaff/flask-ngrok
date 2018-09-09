@@ -11,6 +11,7 @@ from pathlib import Path
 from threading import Thread
 
 import requests
+from flask import request
 
 
 def _run_ngrok():
@@ -81,6 +82,9 @@ def run_with_ngrok(app):
         ngrok_address = _run_ngrok()
         print(f" * Running on {ngrok_address}")
         print(f" * Traffic stats available on http://127.0.0.1:4040")
-        thread.join()
-
+        try:
+            thread.join()
+        except KeyboardInterrupt:
+            shutdown_function = request.environ.get('werkzeug.server.shutdown')
+            shutdown_function()
     app.run = new_run
