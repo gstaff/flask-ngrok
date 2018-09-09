@@ -15,7 +15,6 @@ import requests
 def _run_ngrok():
     ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
     _download_ngrok(ngrok_path)
-    os.chmod(ngrok_path, 777)
     system = platform.system()
     if system == "Darwin":
         command = "ngrok"
@@ -25,8 +24,10 @@ def _run_ngrok():
         command = "ngrok"
     else:
         raise Exception(f"{system} is not supported")
+    executable = str(Path(ngrok_path, command))
+    os.chmod(executable, 777)
 
-    ngrok = subprocess.Popen([str(Path(ngrok_path, command)), 'http', '5000'])
+    ngrok = subprocess.Popen([executable, 'http', '5000'])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
     tunnel_url = requests.get(localhost_url).text  # Get the tunnel information
