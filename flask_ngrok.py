@@ -85,6 +85,6 @@ def run_with_ngrok(app):
         try:
             thread.join()
         except KeyboardInterrupt:
-            shutdown_function = request.environ.get('werkzeug.server.shutdown')
-            shutdown_function()
+            from threading import *
+            thread._Thread_Stop()
     app.run = new_run
