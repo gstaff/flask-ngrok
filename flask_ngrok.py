@@ -82,7 +82,7 @@ def run_with_ngrok(app):
     old_run = app.run
 
     def new_run():
-        thread = Timer(0.1, start_ngrok)
+        thread = Timer(1, start_ngrok)
         thread.setDaemon(True)
         thread.start()
         old_run()
