@@ -18,6 +18,7 @@ Notebooks have [an issue](https://stackoverflow.com/questions/51180917/python-fl
 ```bash
 !pip install flask==0.12.2
 ```
+See the [example notebook](https://colab.research.google.com/github/gstaff/flask-ngrok/blob/master/examples/flask_ngrok_example.ipynb) for a working example.
 
 ## Quickstart
 1. Import with ```from flask_ngrok import run_with_ngrok```
