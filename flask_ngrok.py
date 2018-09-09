@@ -5,6 +5,7 @@ import platform
 import shutil
 import subprocess
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 from threading import Thread
@@ -30,6 +31,7 @@ def _run_ngrok():
     ngrok = subprocess.Popen([executable, 'http', '5000'])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
+    time.sleep(1)
     tunnel_url = requests.get(localhost_url).text  # Get the tunnel information
     j = json.loads(tunnel_url)
 
