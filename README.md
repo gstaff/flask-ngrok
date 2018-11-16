@@ -7,7 +7,7 @@ A simple way to demo Flask apps from your machine.
 Makes your [Flask](http://flask.pocoo.org/) apps running on localhost available
  over the internet via the excellent [ngrok](https://ngrok.com/) tool.
 
-## Compatability
+## Compatibility
 Python 3.6+ is required.
 
 ## Installation
