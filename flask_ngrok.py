@@ -13,9 +13,7 @@ from threading import Timer
 import requests
 
 
-def _run_ngrok():
-    ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
-    _download_ngrok(ngrok_path)
+def _get_command():
     system = platform.system()
     if system == "Darwin":
         command = "ngrok"
@@ -24,11 +22,17 @@ def _run_ngrok():
     elif system == "Linux":
         command = "ngrok"
     else:
-        raise Exception(f"{system} is not supported")
-    executable = str(Path(ngrok_path, command))
-    os.chmod(executable, 777)
+        raise Exception("{system} is not supported".format(system=system))
+    return command
 
-    ngrok = subprocess.Popen([executable, 'http', '5000'])
+
+def _run_ngrok(port):
+    command = _get_command()
+    ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
+    _download_ngrok(ngrok_path)
+    executable = str(Path(ngrok_path, command))
+    os.chmod(executable, 0o777)
+    ngrok = subprocess.Popen([executable, 'http', str(port)])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
     time.sleep(1)
@@ -66,8 +70,8 @@ def _download_file(url):
     return download_path
 
 
-def start_ngrok():
-    ngrok_address = _run_ngrok()
+def start_ngrok(port):
+    ngrok_address = _run_ngrok(port)
     print(f" * Running on {ngrok_address}")
     print(f" * Traffic stats available on http://127.0.0.1:4040")
 
@@ -81,9 +85,10 @@ def run_with_ngrok(app):
     """
     old_run = app.run
 
-    def new_run():
-        thread = Timer(1, start_ngrok)
+    def new_run(*args, **kwargs):
+        port = kwargs.get('port', 5000)
+        thread = Timer(1, start_ngrok, args=(port,))
         thread.setDaemon(True)
         thread.start()
-        old_run()
+        old_run(*args, **kwargs)
     app.run = new_run
