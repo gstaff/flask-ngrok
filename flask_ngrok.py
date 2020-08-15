@@ -1,6 +1,8 @@
 import atexit
 import json
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import platform
 import shutil
 import subprocess
@@ -25,13 +27,15 @@ def _get_command():
         raise Exception("{system} is not supported".format(system=system))
     return command
 
-
 def _run_ngrok(port):
     command = _get_command()
     ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
     _download_ngrok(ngrok_path)
+    token = os.environ.get('NGROK_AUTH_TOKEN')
     executable = str(Path(ngrok_path, command))
     os.chmod(executable, 0o777)
+    if token:
+        os.system('./{} authtoken {}'.format(executable, token))
     ngrok = subprocess.Popen([executable, 'http', str(port)])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
