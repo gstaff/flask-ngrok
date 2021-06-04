@@ -47,3 +47,6 @@ python flask_ngrok_example.py
  * Running on http://<random-address>.ngrok.io
  * Traffic stats available on http://127.0.0.1:4040 
 ```
+
+### Using Custom Subdomains
+To use a custom subdomain, use it as the second argument of `run_with_ngrok(app, subdomain)`
