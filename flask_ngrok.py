@@ -33,11 +33,12 @@ def _run_ngrok(port, subdomain=None):
     executable = str(Path(ngrok_path, command))
     os.chmod(executable, 0o777)
 
+    popen_args = [executable, 'http']
     if subdomain is not None:
-        subdomain_arg = '-subdomain=' + subdomain
-        ngrok = subprocess.Popen([executable, 'http', subdomain_arg,  str(port)])
-    else:
-        ngrok = subprocess.Popen([executable, 'http', str(port)])
+        popen_args.append('-subdomain=' + subdomain)
+    popen_args.append(str(port))
+    ngrok = subprocess.Popen(popen_args)
+
 
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
