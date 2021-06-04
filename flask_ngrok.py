@@ -26,14 +26,14 @@ def _get_command():
     return command
 
 
-def _run_ngrok(port, subdomain = ""):
+def _run_ngrok(port, subdomain=None):
     command = _get_command()
     ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
     _download_ngrok(ngrok_path)
     executable = str(Path(ngrok_path, command))
     os.chmod(executable, 0o777)
 
-    if (subdomain != ""):
+    if subdomain is not None:
         subdomain_arg = '-subdomain=' + subdomain
         ngrok = subprocess.Popen([executable, 'http', subdomain_arg,  str(port)])
     else:
@@ -76,13 +76,13 @@ def _download_file(url):
     return download_path
 
 
-def start_ngrok(port, subdomain = ""):
+def start_ngrok(port, subdomain=None):
     ngrok_address = _run_ngrok(port, subdomain)
     print(f" * Running on {ngrok_address}")
     print(f" * Traffic stats available on http://127.0.0.1:4040")
 
 
-def run_with_ngrok(app, subdomain = ""):
+def run_with_ngrok(app, subdomain=None):
     """
     The provided Flask app will be securely exposed to the public internet via ngrok when run,
     and the its ngrok address will be printed to stdout
