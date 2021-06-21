@@ -1,6 +1,7 @@
 import atexit
 import json
 import os
+import stat
 import platform
 import shutil
 import subprocess
@@ -31,7 +32,7 @@ def _run_ngrok(port):
     ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
     _download_ngrok(ngrok_path)
     executable = str(Path(ngrok_path, command))
-    os.chmod(executable, 0o777)
+    os.chmod(executable, stat.S_IEXEC) # Make file executable for the current user.
     ngrok = subprocess.Popen([executable, 'http', str(port)])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
