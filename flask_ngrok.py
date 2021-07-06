@@ -3,7 +3,6 @@ import json
 import os
 import platform
 import shutil
-import subprocess
 import tempfile
 import time
 import zipfile
@@ -32,14 +31,17 @@ def _run_ngrok(port):
     _download_ngrok(ngrok_path)
     executable = str(Path(ngrok_path, command))
     os.chmod(executable, 0o777)
-    ngrok = subprocess.Popen([executable, 'http', str(port)])
+    ngrok = os.popen(f"{ngrok_path}/./ngrok http {port}")
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
-    time.sleep(1)
+    time.sleep(2)
     tunnel_url = requests.get(localhost_url).text  # Get the tunnel information
     j = json.loads(tunnel_url)
 
-    tunnel_url = j['tunnels'][0]['public_url']  # Do the parsing of the get
+    try:
+        tunnel_url = j['tunnels'][0]['public_url']  # Do the parsing of the get
+    except :
+        print(" * may be internet not available or try again")
     tunnel_url = tunnel_url.replace("https", "http")
     return tunnel_url
 
