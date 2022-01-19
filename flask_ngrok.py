@@ -53,7 +53,12 @@ def _download_ngrok(ngrok_path):
     elif system == "Windows":
         url = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip"
     elif system == "Linux":
-        url = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip"
+        if 'arm' in os.uname().machine and platform.architecture()[0] == '64bit':
+            url="https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm64.zip"
+        elif 'arm' in os.uname().machine and platform.architecture()[0] == '32bit':
+            url="https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm.zip"
+        else:
+            url = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip"
     else:
         raise Exception(f"{system} is not supported")
     download_path = _download_file(url)
@@ -92,3 +97,4 @@ def run_with_ngrok(app):
         thread.start()
         old_run(*args, **kwargs)
     app.run = new_run
+
