@@ -7,13 +7,17 @@ import subprocess
 import tempfile
 import time
 import zipfile
+import requests
+import httplib2
+
 from pathlib import Path
 from threading import Timer
+from bs4 import BeautifulSoup, SoupStrainer
 
-import requests
 
-
-def _get_command():
+def _run_ngrok(autotoken):
+    ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
+    _download_ngrok(ngrok_path)
     system = platform.system()
     if system == "Darwin":
         command = "ngrok"
@@ -22,17 +26,14 @@ def _get_command():
     elif system == "Linux":
         command = "ngrok"
     else:
-        raise Exception("{system} is not supported".format(system=system))
-    return command
-
-
-def _run_ngrok(port):
-    command = _get_command()
-    ngrok_path = str(Path(tempfile.gettempdir(), "ngrok"))
-    _download_ngrok(ngrok_path)
+        raise Exception(f"{system} is not supported")
     executable = str(Path(ngrok_path, command))
-    os.chmod(executable, 0o777)
-    ngrok = subprocess.Popen([executable, 'http', str(port)])
+    os.chmod(executable, 777)
+
+    ngrok = subprocess.Popen([executable, 'authtoken', autotoken])
+    atexit.register(ngrok.terminate)
+    time.sleep(1)
+    ngrok = subprocess.Popen([executable, 'http', '5000'])
     atexit.register(ngrok.terminate)
     localhost_url = "http://localhost:4040/api/tunnels"  # Url with tunnel details
     time.sleep(1)
@@ -48,14 +49,17 @@ def _download_ngrok(ngrok_path):
     if Path(ngrok_path).exists():
         return
     system = platform.system()
-    if system == "Darwin":
-        url = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-darwin-amd64.zip"
-    elif system == "Windows":
-        url = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip"
-    elif system == "Linux":
-        url = "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip"
+    http = httplib2.Http()
+    status, response = http.request('https://ngrok.com/download')
+
+    # Find the right link according to the system and download the files from it
+    if system in ['Darwin', 'Windows', 'Linux']:
+        for link in BeautifulSoup(response, parse_only=SoupStrainer('a'), features="html.parser"):
+            if link.has_attr('href') and f'stable-{system.lower()}' in link['href']:
+                url = link['href']
     else:
         raise Exception(f"{system} is not supported")
+
     download_path = _download_file(url)
     with zipfile.ZipFile(download_path, "r") as zip_ref:
         zip_ref.extractall(ngrok_path)
@@ -66,17 +70,18 @@ def _download_file(url):
     r = requests.get(url, stream=True)
     download_path = str(Path(tempfile.gettempdir(), local_filename))
     with open(download_path, 'wb') as f:
+        print('Please wait for the download to be finished (can take a few minutes), This files are required for ngrok link to be generated')
         shutil.copyfileobj(r.raw, f)
     return download_path
 
 
-def start_ngrok(port):
-    ngrok_address = _run_ngrok(port)
+def start_ngrok(*autotoken):
+    ngrok_address = _run_ngrok(''.join(autotoken))
     print(f" * Running on {ngrok_address}")
     print(f" * Traffic stats available on http://127.0.0.1:4040")
 
 
-def run_with_ngrok(app):
+def run_with_ngrok(app, autotoken):
     """
     The provided Flask app will be securely exposed to the public internet via ngrok when run,
     and the its ngrok address will be printed to stdout
@@ -85,10 +90,9 @@ def run_with_ngrok(app):
     """
     old_run = app.run
 
-    def new_run(*args, **kwargs):
-        port = kwargs.get('port', 5000)
-        thread = Timer(1, start_ngrok, args=(port,))
+    def new_run():
+        thread = Timer(1, start_ngrok, args=autotoken)
         thread.setDaemon(True)
         thread.start()
-        old_run(*args, **kwargs)
+        old_run()
     app.run = new_run
