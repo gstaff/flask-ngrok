@@ -15,30 +15,31 @@ Python 3.6+ is required.
 ```bash
 pip install flask-ngrok
 ```
-### Inside Jupyter / Colab Notebooks
-Notebooks have [an issue](https://stackoverflow.com/questions/51180917/python-flask-unsupportedoperation-not-writable) with newer versions of Flask, so force an older version if working in these environments.
-```bash
-!pip install flask==0.12.2
-```
 See the [example notebook](https://colab.research.google.com/github/gstaff/flask-ngrok/blob/master/examples/flask_ngrok_example.ipynb) for a working example.
 
 ## Quickstart
+0. Signup on `ngrok` to get an auth token.
 1. Import with ```from flask_ngrok import run_with_ngrok```
-2. Add `run_with_ngrok(app)` to make your Flask app available upon running
+2. Add `run_with_ngrok(app, 'YOUR AUTH TOKEN')` to make your Flask app available upon running
 ```python
-# flask_ngrok_example.py
+# examples/flask_ngrok_example.py
 from flask import Flask
+import os
+
 from flask_ngrok import run_with_ngrok
 
 app = Flask(__name__)
-run_with_ngrok(app)  # Start ngrok when app is run
+run_with_ngrok(app, '<YOUR AUTH TOKEN HERE>')  # Start ngrok when app is run
+
 
 @app.route("/")
 def hello():
     return "Hello World!"
 
+
 if __name__ == '__main__':
     app.run()
+
 ```
 Running the example:
 ```bash
